@@ -43,6 +43,15 @@ const getDownloadDirectory = () => Platform.OS == 'android'
 
 const getParentDirectory = (filePath: string) => filePath.slice(0, filePath.lastIndexOf('/'))
 
+const getDownloadErrorText = (error: any) => {
+  const message = String(error?.message ?? '')
+  if (/timeout|timed out|SocketTimeout/i.test(message)) return '连接超时，请重试'
+  if (/UnknownHost|Unable to resolve host|network is unreachable|Network is unreachable/i.test(message)) return '网络不可用，请检查连接'
+  if (/HTTP 401|HTTP 403/i.test(message)) return '歌曲地址已失效，请重试'
+  if (/HTTP 404/i.test(message)) return '未找到歌曲资源，请重试'
+  return message || '下载失败，请重试'
+}
+
 export const initDownloadList = async() => {
   if (initialized) return list
   initialized = true
@@ -76,7 +85,7 @@ const createTask = async(musicInfo: LX.Music.MusicInfoOnline): Promise<LX.Downlo
   await initDownloadList()
   const requestedQuality = getRequestedQuality(musicInfo)
   const old = list.find(item => item.metadata.musicInfo.id == musicInfo.id && (item.metadata.requestedQuality ?? item.metadata.quality) == requestedQuality)
-  if (old && !forceNew) return old
+  if (old) return old
   const baseId = `${musicInfo.source}_${musicInfo.id}_${requestedQuality}`
   return {
     id: baseId,
@@ -196,7 +205,7 @@ const runDownload = async(task: LX.Download.ListItem) => {
       return task
     }
     task.status = 'error'
-    task.statusText = error?.message ?? '下载失败'
+    task.statusText = getDownloadErrorText(error)
     task.isComplate = false
     await persist()
     emit()
