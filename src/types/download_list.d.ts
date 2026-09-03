@@ -51,6 +51,7 @@ declare namespace LX {
       metadata: {
         musicInfo: LX.Music.MusicInfoOnline
         url: string | null
+        requestedQuality?: LX.Quality
         quality: LX.Quality
         ext: FileExt
         fileName: string

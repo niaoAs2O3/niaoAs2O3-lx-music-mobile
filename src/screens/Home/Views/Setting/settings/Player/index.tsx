@@ -3,6 +3,8 @@ import { memo } from 'react'
 import Section from '../../components/Section'
 import IsSavePlayTime from './IsSavePlayTime'
 import PlayHighQuality from './PlayHighQuality'
+import DownloadQuality from './DownloadQuality'
+import DownloadPath from './DownloadPath'
 import IsHandleAudioFocus from './IsHandleAudioFocus'
 import IsEnableAudioOffload from './IsEnableAudioOffload'
 import IsAutoCleanPlayedList from './IsAutoCleanPlayedList'
@@ -33,6 +35,8 @@ export default memo(() => {
       <IsS2T />
       <MaxCache />
       <PlayHighQuality />
+      <DownloadQuality />
+      <DownloadPath />
     </Section>
   )
 })

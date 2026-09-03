@@ -43,6 +43,7 @@ export const storageDataPrefix = {
   viewPrevState: '@view_prev_state',
 
   list: '@list__',
+  downloadList: '@download_list',
   listScrollPosition: '@list_scroll_position',
   listPrevSelectId: '@list_prev_select_id',
 
@@ -103,7 +104,7 @@ export const NAV_MENUS = [
   { id: 'nav_songlist', icon: 'album' },
   { id: 'nav_top', icon: 'leaderboard' },
   { id: 'nav_love', icon: 'love' },
-  // { id: 'download', icon: 'download-2' },
+  { id: 'nav_download', icon: 'download-2' },
   { id: 'nav_setting', icon: 'setting' },
 ] as const
 

@@ -352,6 +352,16 @@ declare global {
       'download.fileName': '歌名 - 歌手' | '歌手 - 歌名' | '歌名'
 
       /**
+       * 下载歌曲的优先音质
+       */
+      'download.quality': LX.Quality
+
+      /**
+       * 下载目录，为空时使用默认公共音乐目录
+       */
+      'download.path': string
+
+      /**
        * 是否启用同步
        */
       'sync.enable': boolean

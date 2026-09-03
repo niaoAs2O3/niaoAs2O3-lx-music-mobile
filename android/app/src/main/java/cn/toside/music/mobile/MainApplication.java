@@ -11,6 +11,7 @@ import java.util.List;
 
 import cn.toside.music.mobile.cache.CachePackage;
 import cn.toside.music.mobile.crypto.CryptoPackage;
+import cn.toside.music.mobile.download.ResumableDownloadPackage;
 import cn.toside.music.mobile.lyric.LyricPackage;
 import cn.toside.music.mobile.userApi.UserApiPackage;
 import cn.toside.music.mobile.utils.UtilsPackage;
@@ -31,6 +32,7 @@ public class MainApplication extends NavigationApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           packages.add(new CachePackage());
+          packages.add(new ResumableDownloadPackage());
           packages.add(new LyricPackage());
           packages.add(new UtilsPackage());
           packages.add(new CryptoPackage());

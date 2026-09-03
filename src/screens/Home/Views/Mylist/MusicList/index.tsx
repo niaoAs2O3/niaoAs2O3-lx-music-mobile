@@ -15,6 +15,7 @@ import ListMusicSearch, { type ListMusicSearchType } from './ListMusicSearch'
 import MusicPositionModal, { type MusicPositionModalType } from './MusicPositionModal'
 import MetadataEditModal, { type MetadataEditType, type MetadataEditProps } from '@/components/MetadataEditModal'
 import MusicToggleModal, { type MusicToggleModalType } from './MusicToggleModal'
+import { downloadMusic, downloadMusicList } from '@/core/download'
 
 
 export default () => {
@@ -155,6 +156,7 @@ export default () => {
         ref={listMenuRef}
         onPlay={info => { handlePlay(info.listId, info.index) }}
         onPlayLater={info => { hancelExitSelect(); handlePlayLater(info.listId, info.musicInfo, info.selectedList, hancelExitSelect) }}
+        onDownload={info => { void (info.selectedList.length ? downloadMusicList(info.selectedList as LX.Music.MusicInfoOnline[]) : downloadMusic(info.musicInfo as LX.Music.MusicInfoOnline)) }}
         onRemove={info => { hancelExitSelect(); handleRemove(info.listId, info.musicInfo, info.selectedList, hancelExitSelect) }}
         onDislikeMusic={info => { void handleDislikeMusic(info.musicInfo) }}
         onCopyName={info => { handleShare(info.musicInfo) }}
