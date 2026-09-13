@@ -2,7 +2,7 @@ import { memo } from 'react'
 import { View } from 'react-native'
 import Button from '@/components/common/Button'
 
-import { createStyle } from '@/utils/tools'
+import { createStyle, toast } from '@/utils/tools'
 import { pop } from '@/navigation'
 import { useTheme } from '@/store/theme/hook'
 import commonState from '@/store/common/state'
@@ -11,6 +11,7 @@ import { handleCollect, handlePlay } from './listAction'
 import songlistState from '@/store/songlist/state'
 import { useI18n } from '@/lang'
 import { useListInfo } from './state'
+import { downloadSonglist } from '@/core/download'
 // import { NAV_SHEAR_NATIVE_IDS } from '@/config/constant'
 
 export default memo(() => {
@@ -32,6 +33,14 @@ export default memo(() => {
     void handleCollect(info.id, info.source, songlistState.listDetailInfo.info.name || info.name)
   }
 
+  const handleDownloadAll = () => {
+    if (!songlistState.listDetailInfo.info.name) return
+    void downloadSonglist(info.source, info.id).catch(error => {
+      const message = String(error?.message ?? '无法加载后续歌曲')
+      toast(`歌单下载未完全加入：${message}`, 'long')
+    })
+  }
+
   return (
     <View style={styles.container}>
       <Button onPress={handleCollection} style={styles.controlBtn}>
@@ -39,6 +48,9 @@ export default memo(() => {
       </Button>
       <Button onPress={handlePlayAll} style={styles.controlBtn}>
         <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>{t('play_all')}</Text>
+      </Button>
+      <Button onPress={handleDownloadAll} style={styles.controlBtn}>
+        <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>下载全部</Text>
       </Button>
       <Button onPress={back} style={styles.controlBtn}>
         <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>{t('back')}</Text>
@@ -57,7 +69,7 @@ const styles = createStyle({
   controlBtn: {
     flexGrow: 1,
     flexShrink: 1,
-    width: '33%',
+    width: '25%',
     paddingTop: 12,
     paddingBottom: 12,
     paddingLeft: 10,

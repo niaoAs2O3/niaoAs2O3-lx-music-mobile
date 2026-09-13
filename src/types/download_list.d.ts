@@ -6,11 +6,14 @@
 
 declare namespace LX {
   namespace Download {
-    type DownloadTaskStatus = 'run'
-    | 'waiting'
-    | 'pause'
-    | 'error'
+    type DownloadTaskStatus = 'pending'
+    | 'downloading'
+    | 'paused'
     | 'completed'
+    | 'failed'
+    | 'cancelled'
+
+    type QualityPreference = LX.Quality
 
     type FileExt = 'mp3' | 'flac' | 'wav' | 'ape'
 
@@ -48,14 +51,17 @@ declare namespace LX {
       total: number
       progress: number
       speed: string
+      retryCount?: number
       metadata: {
         musicInfo: LX.Music.MusicInfoOnline
         url: string | null
-        requestedQuality?: LX.Quality
+        requestedQuality?: QualityPreference
         quality: LX.Quality
         ext: FileExt
         fileName: string
         filePath: string
+        tempFilePath?: string
+        batch?: boolean
       }
     }
 

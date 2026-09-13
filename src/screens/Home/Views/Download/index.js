@@ -30,7 +30,7 @@ const sortMenus = [
 
 const getSortedItems = (items, sort) => {
   if (sort == 'default') return items
-  const statusOrder = { run: 0, waiting: 1, pause: 2, error: 3, completed: 4 }
+  const statusOrder = { downloading: 0, pending: 1, paused: 2, failed: 3, completed: 4, cancelled: 5 }
   return items.map((item, index) => ({ item, index })).sort((a, b) => {
     if (sort == 'status') return (statusOrder[a.item.status] ?? 99) - (statusOrder[b.item.status] ?? 99) || a.index - b.index
     const aValue = sort == 'name' ? a.item.metadata.musicInfo.name : a.item.metadata.musicInfo.singer
@@ -88,16 +88,16 @@ export default () => {
         <Text style={styles.sn} size={13} color={theme['c-300']}>{index + 1}</Text>
         <TouchableOpacity style={styles.info} disabled={!item.isComplate} onPress={() => { playList(LIST_IDS.DOWNLOAD, getDownloadList().indexOf(item)) }}>
           <Text size={15} numberOfLines={1}>{item.metadata.musicInfo.name} - {item.metadata.musicInfo.singer}</Text>
-          <Text style={styles.status} size={11} color={item.status == 'error' ? theme['c-primary-font'] : theme['c-font-label']} numberOfLines={1}>{item.statusText}{item.total ? ` ${item.progress}%` : ''} · {getQualityLabel(item)}</Text>
+          <Text style={styles.status} size={11} color={item.status == 'failed' ? theme['c-primary-font'] : theme['c-font-label']} numberOfLines={1}>{item.statusText}{item.total ? ` ${item.progress}%` : ''} · {getQualityLabel(item)}</Text>
         </TouchableOpacity>
         <View style={styles.actions}>
-          {item.status == 'run' && <TouchableOpacity style={styles.action} accessibilityLabel="暂停下载" onPress={() => { pauseDownload(item.id) }}>
+          {(item.status == 'downloading' || item.status == 'pending') && <TouchableOpacity style={styles.action} accessibilityLabel="暂停下载" onPress={() => { pauseDownload(item.id) }}>
             <Icon name="pause" color={theme['c-primary-font']} size={18} />
           </TouchableOpacity>}
-          {item.status == 'pause' && <TouchableOpacity style={styles.action} accessibilityLabel="继续下载" onPress={() => { resumeDownload(item.id) }}>
+          {item.status == 'paused' && <TouchableOpacity style={styles.action} accessibilityLabel="继续下载" onPress={() => { resumeDownload(item.id) }}>
             <Icon name="play" color={theme['c-primary-font']} size={18} />
           </TouchableOpacity>}
-          {item.status == 'error' && <TouchableOpacity style={styles.action} accessibilityLabel="重试下载" onPress={() => { retryDownload(item.id) }}>
+          {item.status == 'failed' && <TouchableOpacity style={styles.action} accessibilityLabel="重试下载" onPress={() => { retryDownload(item.id) }}>
             <Icon name="available_updates" color={theme['c-primary-font']} size={18} />
           </TouchableOpacity>}
           <TouchableOpacity ref={ref => { moreButtonRefs.current[item.id] = ref }} style={styles.action} accessibilityLabel="下载更多操作" onPress={() => { showMenu(item) }}>

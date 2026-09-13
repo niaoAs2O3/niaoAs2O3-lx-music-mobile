@@ -24,12 +24,12 @@ import okhttp3.ResponseBody;
 public class ResumableDownloadModule extends ReactContextBaseJavaModule {
   private static final String PROGRESS_EVENT = "resumable-download-progress";
   private final ReactApplicationContext reactContext;
-  private static final int MAX_ATTEMPTS = 3;
+  private static final int MAX_ATTEMPTS = 1;
   private final OkHttpClient client = new OkHttpClient.Builder()
     .connectTimeout(45, TimeUnit.SECONDS)
     .readTimeout(45, TimeUnit.SECONDS)
     .writeTimeout(45, TimeUnit.SECONDS)
-    .retryOnConnectionFailure(true)
+    .retryOnConnectionFailure(false)
     .build();
   private final ConcurrentHashMap<String, Call> calls = new ConcurrentHashMap<>();
 
