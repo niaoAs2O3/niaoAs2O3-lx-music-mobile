@@ -66,3 +66,7 @@ buck-out/
 
 # testing
 /coverage
+
+# React Native Android build artifacts
+*.bundle
+/res/
