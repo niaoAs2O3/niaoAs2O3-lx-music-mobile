@@ -1,4 +1,4 @@
-import { NativeEventEmitter, NativeModules } from 'react-native'
+import { NativeEventEmitter, NativeModules, type NativeModule } from 'react-native'
 
 interface NativeDownloadResult {
   statusCode: number
@@ -13,7 +13,7 @@ interface NativeDownloadProgress {
   total: number
 }
 
-const nativeModule = NativeModules.ResumableDownloadModule as {
+const nativeModule = NativeModules.ResumableDownloadModule as NativeModule & {
   download: (id: string, url: string, filePath: string) => Promise<NativeDownloadResult>
   cancel: (id: string) => void
 }

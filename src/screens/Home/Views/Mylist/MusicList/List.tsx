@@ -1,6 +1,9 @@
 import { playList } from '@/core/player/player'
 import { useMemo, useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent, type FlatListProps } from 'react-native'
+import { FlatList, View, type NativeScrollEvent, type NativeSyntheticEvent, type FlatListProps } from 'react-native'
+import LocatePlayingButton, { locatePlayingListStyle } from '@/components/LocatePlayingButton'
+import { useI18n } from '@/lang'
+import { findPlayingIndex, getLocateScrollParams } from '@/utils/playingList'
 
 import listState from '@/store/list/state'
 import playerState from '@/store/player/state'
@@ -8,8 +11,8 @@ import { getListPosition, getListPrevSelectId, saveListPosition } from '@/utils/
 // import { useMusicList } from '@/store/list/hook'
 import { getListMusics, setActiveList } from '@/core/list'
 import ListItem, { ITEM_HEIGHT } from './ListItem'
-import { createStyle, getRowInfo } from '@/utils/tools'
-import { usePlayInfo, usePlayMusicInfo } from '@/store/player/hook'
+import { createStyle, getRowInfo, toast } from '@/utils/tools'
+import { usePlayMusicInfo } from '@/store/player/hook'
 import type { Position } from './ListMenu'
 import type { SelectMode } from './MultipleModeBar'
 import { useActiveListId } from '@/store/list/hook'
@@ -31,21 +34,20 @@ export interface ListType {
   scrollToTop: () => void
 }
 
-const usePlayIndex = () => {
-  const activeListId = useActiveListId()
+const usePlayIndex = (list: LX.List.ListMusics) => {
   const playMusicInfo = usePlayMusicInfo()
-  const playInfo = usePlayInfo()
 
   const playIndex = useMemo(() => {
-    return playMusicInfo.listId == activeListId ? playInfo.playIndex : -1
-  }, [activeListId, playInfo.playIndex, playMusicInfo.listId])
+    return findPlayingIndex(list, playMusicInfo.musicInfo)
+  }, [list, playMusicInfo.musicInfo])
 
   return playIndex
 }
 
 
 const List = forwardRef<ListType, ListProps>(({ onShowMenu, onMuiltSelectMode, onSelectAll }, ref) => {
-  // const t = useI18n()
+  const t = useI18n()
+  const activeListId = useActiveListId()
   const flatListRef = useRef<FlatList>(null)
   const [currentList, setList] = useState<LX.List.ListMusics>([])
   const listFirstScrollRef = useRef(false)
@@ -177,7 +179,21 @@ const List = forwardRef<ListType, ListProps>(({ onShowMenu, onMuiltSelectMode, o
     }
   }, [])
 
-  const activeIndex = usePlayIndex()
+  const activeIndex = usePlayIndex(currentList)
+  const handleLocatePlaying = () => {
+    // Read at press time so a track change cannot leave a stale target.
+    const music = playerState.playMusicInfo.musicInfo
+    if (!music) {
+      toast(t('list_locate_playing_empty'))
+      return
+    }
+    const index = findPlayingIndex(currentList, music)
+    if (currentListIdRef.current != activeListId || activeListId != listState.activeListId || index < 0) {
+      toast(t('list_locate_playing_missing'))
+      return
+    }
+    flatListRef.current?.scrollToIndex(getLocateScrollParams(index, rowInfo.current.rowNum))
+  }
   const handlePlay = (index: number) => {
     void playList(listState.activeListId, index)
   }
@@ -269,23 +285,27 @@ const List = forwardRef<ListType, ListProps>(({ onShowMenu, onMuiltSelectMode, o
   }
 
   return (
-    <FlatList
-      ref={flatListRef}
-      onScroll={handleScroll}
-      style={styles.list}
-      data={currentList}
-      maxToRenderPerBatch={4}
-      numColumns={rowInfo.current.rowNum}
-      horizontal={false}
-      // updateCellsBatchingPeriod={80}
-      windowSize={8}
-      removeClippedSubviews={true}
-      initialNumToRender={12}
-      renderItem={renderItem}
-      keyExtractor={getkey}
-      extraData={activeIndex}
-      getItemLayout={getItemLayout}
-    />
+    <View style={styles.container}>
+      <FlatList
+        ref={flatListRef}
+        onScroll={handleScroll}
+        style={styles.list}
+        data={currentList}
+        maxToRenderPerBatch={4}
+        numColumns={rowInfo.current.rowNum}
+        horizontal={false}
+        // updateCellsBatchingPeriod={80}
+        windowSize={8}
+        removeClippedSubviews={true}
+        initialNumToRender={12}
+        renderItem={renderItem}
+        keyExtractor={getkey}
+        extraData={activeIndex}
+        getItemLayout={getItemLayout}
+        contentContainerStyle={locatePlayingListStyle.content}
+      />
+      <LocatePlayingButton onPress={handleLocatePlaying} />
+    </View>
   )
 })
 
